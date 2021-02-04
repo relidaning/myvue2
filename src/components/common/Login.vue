@@ -28,6 +28,8 @@
     import {
         mapState,mapActions
     } from 'vuex'
+
+    import{ setToken } from '@/http/auth'
     export default {
         data() {
             return {
@@ -66,19 +68,20 @@
         },
         methods: {
             ...mapActions('user', ['updateName']),
-            ...mapActions('common', {updateLang: "updateLanguage"}),
+            ...mapActions('common', {updateLang: "updateLanguage", resetState: "resetState"}),
             // 提交表单
             dataFormSubmit() {
                 // TODO：登录代码逻辑待完善
                 // alert("登录代码逻辑未完善")
-                this.$http({
-                    url: '/auth/token',
-                    method: 'get'
-                }).then(response => {
+                this.$http.login.getToken().then(response => {
                     this.$message({
                         message: this.$t("login.signInSuccess"),
                         type: 'success'
                     })
+
+                    //保存token
+                    setToken(response.data.token)
+
                     this.updateName(this.dataForm.userName)
                     console.log(response)
                     this.$router.push({
@@ -92,6 +95,10 @@
             }
         },
         created() {
+            //进入页面前， 移除主页面保存的state信息
+            localStorage.removeItem('store')
+            this.resetState()    
+
             // 页面创建时，获取当前系统语言，并显示在下拉框中
             this.dataForm.language = this.$i18n.locale
         }

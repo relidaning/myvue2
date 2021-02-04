@@ -16,7 +16,7 @@
                         background-color 表示背景颜色。
                         text-color 表示字体颜色。
                     -->
-                <el-menu :default-active="menuActiveName || 'home'" :collapse="!foldAside" :collapseTransition="false"
+                <el-menu :default-active="menuActiveName || 'HomePage'" :collapse="!foldAside" :collapseTransition="false"
                  background-color="#263238" text-color="#8a979e">
                     <el-menu-item index="home" @click="$router.push({ name: 'Home' })">
                         <i class="el-icon-s-home"></i>
@@ -35,6 +35,10 @@
                             <i class="el-icon-document"></i>
                             <span slot="title">ueditor</span>
                         </el-menu-item>
+                        <el-menu-item index="Baidu" @click="$router.push({ name: 'Bilibili' })">
+                            <i class="el-icon-document"></i>
+                            <span slot="title">哔哩哔哩</span>
+                        </el-menu-item>
                     </el-submenu>
                 </el-menu>
             </el-scrollbar>
@@ -43,24 +47,60 @@
 </template>
 
 <script>
+import {mapState, mapActions} from 'vuex'
+import {isURL} from '@/utils/validate.js'
+
 export default {
   name: 'Aside',
   props: ['foldAside'],
   data () {
     return {
       // 保存当前选中的菜单
-      menuActiveName: 'home',
+    //   menuActiveName: 'home',
       // 保存当前侧边栏的宽度
       asideWidth: '200px',
       // 用于拼接当前图标的 class 样式
       iconSize: 'true'
     }
   },
+  computed: {
+      ...mapState('common', ['menuActiveName', 'mainTabs'])
+  },
+  methods: {
+      ...mapActions('common', ['updateMenuActiveName', 'updateMainTabs', 'updateMainTabsActiveName'])
+  },
   watch: {
     // 监视是否折叠侧边栏，折叠则宽度为 64px。
     foldAside (val) {
       this.asideWidth = val ? '200px' : '64px'
       this.iconSize = val
+    },
+    // 监视路由的变化，每次点击菜单项时会触发
+    $route(route) {
+        // 路由变化时，修改当前选中的菜单项
+        this.updateMenuActiveName(route.name)
+        // 是否显示标签页
+        if (route.meta.isTab) {
+
+            console.log('###'+this.mainTabs)
+            // 判断当前标签页数组中是否存在当前选中的标签，根据标签名匹配
+            let tab = this.mainTabs.filter(item => item.name === route.name)[0]
+            // 若当前标签页数组不存在该标签，则向数组中添加标签
+            if (!tab) {
+                // 设置标签页数据
+                tab = {
+                    name: route.name,
+                    params: route.params,
+                    query: route.query,
+                    type: isURL(route.meta.iframeUrl) ? 'iframe' : 'module',
+                    iframeUrl: route.meta.iframeUrl || ''
+                }
+                // 将数据保存到标签页数组中
+                this.updateMainTabs(this.mainTabs.concat(tab))
+            }
+            // 保存标签页中当前选中的标签名
+            this.updateMainTabsActiveName(route.name)
+        }
     }
   }
 }
