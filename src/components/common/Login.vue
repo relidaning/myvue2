@@ -83,7 +83,13 @@
                     setToken(response.data.token)
 
                     this.updateName(this.dataForm.userName)
-                    console.log(response)
+                    // console.log(response)
+
+                    // 获取动态菜单
+                    this.$http.menu.getMenus().then(response => {
+                        console.log(response)
+                    })
+
                     this.$router.push({
                         name: 'Home'
                     })
