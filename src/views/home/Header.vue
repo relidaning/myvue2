@@ -9,13 +9,13 @@
         <div class="header-menu">
             <el-menu mode="horizontal" class="header-menu-submenu">
                 <!-- 设置 -->
-                <el-menu-item title="设置" index="1">
-                    <i class="el-icon-setting"></i>设置
+                <el-menu-item :title="language.setUp" index="1" @click="showSetup">
+                    <i class="el-icon-setting"></i>{{language.setUp}}
                 </el-menu-item>
                 <!-- 帮助文档 -->
-                <el-submenu title="帮助" index="2">
+                <el-submenu :title="language.help" index="2">
                     <template slot="title">
-                        <i class="el-icon-info"></i>帮助
+                        <i class="el-icon-info"></i>{{language.help}}
                     </template>
                     <el-menu-item index="2-1">
                         <a href="https://www.cnblogs.com/l-y-h/" target="_blank" class="header-submenu-a">博客地址</a>
@@ -42,11 +42,16 @@
         </div>
         <!-- 密码修改框 -->
         <UpdatePassword v-if="UpdatePasswordVisible" ref="updatePassowrd"></UpdatePassword>
+
+        <!-- 设置框 -->
+        <Setup v-if="setUpVisible" ref="setUp"></Setup>
     </div>
 </template>
 
 <script>
 import UpdatePassword from '@/views/home/UpdatePassword.vue'
+import Setup from '@/views/home/Setup.vue'
+import {mapState} from 'vuex'
 export default {
   name: 'Header',
   data () {
@@ -54,14 +59,32 @@ export default {
       // 是否展开侧边栏
       foldAside: true,
       // 默认用户名
-      userName: 'admin',
+    //   userName: 'admin',
       // 是否展开密码框
-      UpdatePasswordVisible: false
+      UpdatePasswordVisible: false,
+      setUpVisible: false
+    }
+  },
+  computed: {
+    ...mapState('user', ['userName']),
+    language(){
+        return{
+            foldAside: this.$t("header.foldAside"),
+            unFoldAside: this.$t("header.unFoldAside"),
+            setUp: this.$t("header.setUp"),
+            help: this.$t("header.help"),
+            blogAddress: this.$t("header.blogAddress"),
+            codeAddress: this.$t("header.codeAddress"),
+            userSetUp: this.$t("header.userSetUp"),
+            updatePassword: this.$t("header.updatePassword"),
+            logOut: this.$t("header.logOut")    
+        }
     }
   },
   components: {
     // 引入密码框组件
-    UpdatePassword
+    UpdatePassword,
+    Setup
   },
   methods: {
     // 展开密码修改框
@@ -71,6 +94,12 @@ export default {
       this.$nextTick(() => {
         this.$refs.updatePassowrd.init()
       })
+    },
+    showSetup(){
+        this.setUpVisible = true
+        this.$nextTick(() => {
+            this.$refs.setUp.init()
+        })
     },
     // 展开、折叠侧边栏
     foldOrOpen () {
