@@ -40,6 +40,7 @@
                             <span slot="title">哔哩哔哩</span>
                         </el-menu-item>
                     </el-submenu>
+                    <DynamicMenu v-for="menu in dynamicRoutes" :key="menu.meta.menuId" :menu="menu"></DynamicMenu>
                 </el-menu>
             </el-scrollbar>
         </el-aside>
@@ -49,6 +50,7 @@
 <script>
 import {mapState, mapActions} from 'vuex'
 import {isURL} from '@/utils/validate.js'
+import DynamicMenu from '@/views/dynamic/DynamicMenu.vue'
 
 export default {
   name: 'Aside',
@@ -63,8 +65,11 @@ export default {
       iconSize: 'true'
     }
   },
+  components: {
+    DynamicMenu
+  },
   computed: {
-      ...mapState('common', ['menuActiveName', 'mainTabs'])
+      ...mapState('common', ['menuActiveName', 'mainTabs', 'dynamicRoutes'])
   },
   methods: {
       ...mapActions('common', ['updateMenuActiveName', 'updateMainTabs', 'updateMainTabsActiveName'])
